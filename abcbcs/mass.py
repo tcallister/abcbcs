@@ -49,7 +49,7 @@ def _q_from_mc_m2(mc,m2):
     q_tilde = u1**(1./3.) + u2**(1./3.)
     return (q_tilde - 1./3.).real
 
-class cbc():
+class masses():
 
     """
     Class to help me save time transforming between mass parameters
@@ -78,12 +78,14 @@ class cbc():
 
     def _check_params(self):
 
+        # Check that all parameters are non-negative
         all_params = ["total_mass","chirp_mass",'mass_1',"mass_2","mass_ratio","symmetric_mass_ratio"]
         for param in all_params:
             if hasattr(self,param):
                 if self.__dict__[param]<0:
                     raise Exception("All mass parameters must be positive")
 
+        # Check that mass ratios fall within physically meaningful bounds
         if hasattr(self,'mass_ratio'):
             if self.mass_ratio>1:
                 raise Exception("Mass ratio must be less than unity")
@@ -92,6 +94,7 @@ class cbc():
             if self.symmetric_mass_ratio>0.25:
                 raise Exception("Symmetric mass ratio must be less than 0.25")
 
+        # Also check that pairs of mass parameters obey necessary conditions relative to one another
         if hasattr(self,'mass_1'):
             if hasattr(self,'mass_2'):
                 if self.mass_2>self.mass_1:
@@ -108,8 +111,8 @@ class cbc():
                 if self.total_mass<self.mass_2:
                     raise Exception("Total mass must be greater than mass 2")
             elif hasattr(self,'chirp_mass'):
-                if self.chirp_mass>self.mass_2/2**(1./5.):
-                    raise Exception("Unphysical chirp mass; chirp mass cannot exceed m2/2**(1/5)")
+                if self.chirp_mass<self.mass_2/2**(1./5.):
+                    raise Exception("Unphysical chirp mass; chirp mass cannot be below m2/2**(1/5)")
 
         elif hasattr(self,'total_mass'):
             if hasattr(self,'chirp_mass'):
